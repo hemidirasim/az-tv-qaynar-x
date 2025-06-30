@@ -22,17 +22,17 @@ export const fetchNews = async (page: number = 1, perPage: number = 11): Promise
         console.log('Orijinal şəkil URL-i:', item.image_url);
         
         if (item.image_url && item.image_url.trim() !== '') {
-          // Əgər URL artıq tam path-dursa
+          // Əgər URL artıq tam path-dursa (http/https ilə başlayır)
           if (item.image_url.startsWith('http://') || item.image_url.startsWith('https://')) {
             imageUrl = item.image_url;
           } 
-          // Əgər URL '/' ilə başlayırsa
+          // Əgər URL '/' ilə başlayırsa - admin.aztv.az əlavə et  
           else if (item.image_url.startsWith('/')) {
-            imageUrl = `https://aztv.az${item.image_url}`;
+            imageUrl = `https://admin.aztv.az${item.image_url}`;
           }
-          // Əks halda
+          // Əks halda - admin.aztv.az/ əlavə et
           else {
-            imageUrl = `https://aztv.az/${item.image_url}`;
+            imageUrl = `https://admin.aztv.az/${item.image_url}`;
           }
           
           console.log('Düzəldilmiş şəkil URL-i:', imageUrl);
