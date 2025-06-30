@@ -1,4 +1,3 @@
-
 import { NewsResponse } from '@/types/news';
 
 const API_BASE_URL = 'https://aztv.az/az/mobile-app/api';
@@ -19,32 +18,24 @@ export const fetchNews = async (page: number = 1, perPage: number = 11): Promise
       const newsData = data.data.news.data.map((item: any) => {
         // Şəkil URL-ini düzgün təyin et
         let imageUrl = '/placeholder.svg';
-        if (item.image_url) {
-          try {
-            // URL-də encoding varsa decode et
-            let decodedUrl = decodeURIComponent(item.image_url);
-            
-            // Əgər URL artıq tam yoldursa, olduğu kimi saxla
-            if (decodedUrl.startsWith('http')) {
-              imageUrl = decodedUrl;
-            } else {
-              // Əks halda aztv.az domenini əlavə et və düzgün encode et
-              // Yolu normalize et - əvvəlindəki / işarəsini çıxart
-              if (decodedUrl.startsWith('/')) {
-                decodedUrl = decodedUrl.substring(1);
-              }
-              
-              // URL-i düzgün qur və encode et
-              const fullUrl = `https://aztv.az/${decodedUrl}`;
-              // URL-dəki boşluqları və xüsusi simvolları encode et
-              imageUrl = fullUrl.replace(/\s+/g, '%20').replace(/\(/g, '%28').replace(/\)/g, '%29');
-            }
-            
-            console.log('Şəkil URL-i:', imageUrl);
-          } catch (error) {
-            console.error('Şəkil URL-ini emal edərkən xəta:', error);
-            imageUrl = '/placeholder.svg';
+        
+        console.log('Orijinal şəkil URL-i:', item.image_url);
+        
+        if (item.image_url && item.image_url.trim() !== '') {
+          // Əgər URL artıq tam path-dursa
+          if (item.image_url.startsWith('http://') || item.image_url.startsWith('https://')) {
+            imageUrl = item.image_url;
+          } 
+          // Əgər URL '/' ilə başlayırsa
+          else if (item.image_url.startsWith('/')) {
+            imageUrl = `https://aztv.az${item.image_url}`;
           }
+          // Əks halda
+          else {
+            imageUrl = `https://aztv.az/${item.image_url}`;
+          }
+          
+          console.log('Düzəldilmiş şəkil URL-i:', imageUrl);
         }
         
         // Başlıq, məzmun və alt başlığı düzgün parse et
