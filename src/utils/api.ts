@@ -16,17 +16,44 @@ export const fetchNews = async (page: number = 1, perPage: number = 11): Promise
     
     // API cavabının strukturunu düzəlt
     if (data.success && data.data && data.data.news) {
-      const newsData = data.data.news.data.map((item: any) => ({
-        id: item.id,
-        title: item.title?.az?.value || item.title?.az || 'Başlıq yoxdur',
-        content: item.content?.az?.value || item.content?.az || '',
-        summary: item.sub_title?.az?.value || item.sub_title?.az || '',
-        image: item.image_url ? `https://aztv.az/${item.image_url}` : '/placeholder.svg',
-        date: item.created_at,
-        created_at: item.created_at,
-        slug: item.slug || '',
-        category: ''
-      }));
+      const newsData = data.data.news.data.map((item: any) => {
+        // Şəkil URL-ini düzgün təyin et
+        let imageUrl = '/placeholder.svg';
+        if (item.image_url) {
+          // Əgər URL artıq tam yoldursa, olduğu kimi saxla
+          if (item.image_url.startsWith('http')) {
+            imageUrl = item.image_url;
+          } else {
+            // Əks halda aztv.az domenini əlavə et
+            imageUrl = `https://aztv.az/${item.image_url}`;
+          }
+        }
+        
+        // Başlıq, məzmun və alt başlığı düzgün parse et
+        const parseField = (field: any) => {
+          if (!field) return '';
+          if (typeof field === 'string') return field;
+          if (field.az) {
+            if (typeof field.az === 'string') return field.az;
+            if (field.az.value && field.az.value !== '[Max depth of 5 reached]') {
+              return field.az.value;
+            }
+          }
+          return '';
+        };
+
+        return {
+          id: item.id,
+          title: parseField(item.title) || 'Başlıq yoxdur',
+          content: parseField(item.content) || '',
+          summary: parseField(item.sub_title) || '',
+          image: imageUrl,
+          date: item.created_at,
+          created_at: item.created_at,
+          slug: item.slug || '',
+          category: ''
+        };
+      });
 
       return {
         data: newsData,
