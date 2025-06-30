@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { NewsItem } from '@/types/news';
 import { fetchNews } from '@/utils/api';
@@ -15,6 +15,7 @@ const NewsFeed: React.FC<NewsFeedProps> = ({ onNewsClick }) => {
   const [page, setPage] = useState(1);
   const [allNews, setAllNews] = useState<NewsItem[]>([]);
   const [hasMore, setHasMore] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   const { data, isLoading, error, refetch, isRefetching } = useQuery({
     queryKey: ['news', page],
@@ -31,18 +32,31 @@ const NewsFeed: React.FC<NewsFeedProps> = ({ onNewsClick }) => {
       }
       
       setHasMore(data.current_page < data.last_page);
+      setIsLoadingMore(false);
     }
   }, [data, page]);
 
-  const handleLoadMore = () => {
-    if (hasMore && !isLoading) {
+  // Infinite scroll handler
+  const handleScroll = useCallback(() => {
+    if (window.innerHeight + document.documentElement.scrollTop !== document.documentElement.offsetHeight) {
+      return;
+    }
+    
+    if (hasMore && !isLoading && !isLoadingMore) {
+      setIsLoadingMore(true);
       setPage(prev => prev + 1);
     }
-  };
+  }, [hasMore, isLoading, isLoadingMore]);
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [handleScroll]);
 
   const handleRefresh = () => {
     setPage(1);
     setAllNews([]);
+    setIsLoadingMore(false);
     refetch();
   };
 
@@ -97,24 +111,10 @@ const NewsFeed: React.FC<NewsFeedProps> = ({ onNewsClick }) => {
         ))}
       </div>
 
-      {/* Load More Button */}
-      {hasMore && Array.isArray(allNews) && allNews.length > 0 && (
+      {/* Loading indicator for infinite scroll */}
+      {isLoadingMore && (
         <div className="flex justify-center py-6">
-          <Button 
-            onClick={handleLoadMore}
-            disabled={isLoading}
-            variant="outline"
-            className="px-8"
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                Yüklənir...
-              </>
-            ) : (
-              'Daha çox xəbər yüklə'
-            )}
-          </Button>
+          <Loader2 className="h-6 w-6 animate-spin text-primary" />
         </div>
       )}
 
