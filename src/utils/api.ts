@@ -20,13 +20,18 @@ export const fetchNews = async (page: number = 1, perPage: number = 11): Promise
         // Şəkil URL-ini düzgün təyin et
         let imageUrl = '/placeholder.svg';
         if (item.image_url) {
+          // URL-də encoding varsa decode et
+          const decodedUrl = decodeURIComponent(item.image_url);
+          
           // Əgər URL artıq tam yoldursa, olduğu kimi saxla
-          if (item.image_url.startsWith('http')) {
-            imageUrl = item.image_url;
+          if (decodedUrl.startsWith('http')) {
+            imageUrl = decodedUrl;
           } else {
             // Əks halda aztv.az domenini əlavə et
-            imageUrl = `https://aztv.az/${item.image_url}`;
+            imageUrl = `https://aztv.az/${decodedUrl}`;
           }
+          
+          console.log('Şəkil URL-i:', imageUrl);
         }
         
         // Başlıq, məzmun və alt başlığı düzgün parse et
