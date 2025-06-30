@@ -23,7 +23,7 @@ const NewsFeed: React.FC<NewsFeedProps> = ({ onNewsClick }) => {
   });
 
   useEffect(() => {
-    if (data?.data) {
+    if (data?.data && Array.isArray(data.data)) {
       if (page === 1) {
         setAllNews(data.data);
       } else {
@@ -87,7 +87,7 @@ const NewsFeed: React.FC<NewsFeedProps> = ({ onNewsClick }) => {
 
       {/* News Grid */}
       <div className="grid gap-6 px-4">
-        {allNews.map((news, index) => (
+        {Array.isArray(allNews) && allNews.map((news, index) => (
           <div key={`${news.id}-${index}`} className="fade-in-up">
             <NewsCard 
               news={news} 
@@ -98,7 +98,7 @@ const NewsFeed: React.FC<NewsFeedProps> = ({ onNewsClick }) => {
       </div>
 
       {/* Load More Button */}
-      {hasMore && (
+      {hasMore && Array.isArray(allNews) && allNews.length > 0 && (
         <div className="flex justify-center py-6">
           <Button 
             onClick={handleLoadMore}
@@ -118,9 +118,15 @@ const NewsFeed: React.FC<NewsFeedProps> = ({ onNewsClick }) => {
         </div>
       )}
 
-      {!hasMore && allNews.length > 0 && (
+      {!hasMore && Array.isArray(allNews) && allNews.length > 0 && (
         <div className="text-center py-6">
           <p className="text-muted-foreground text-sm">Bütün xəbərlər yükləndi</p>
+        </div>
+      )}
+
+      {Array.isArray(allNews) && allNews.length === 0 && !isLoading && (
+        <div className="text-center py-12">
+          <p className="text-muted-foreground">Xəbər tapılmadı</p>
         </div>
       )}
     </div>
