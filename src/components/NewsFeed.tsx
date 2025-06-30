@@ -36,13 +36,27 @@ const NewsFeed: React.FC<NewsFeedProps> = ({ onNewsClick }) => {
     }
   }, [data, page]);
 
-  // Infinite scroll handler
+  // Improved infinite scroll handler
   const handleScroll = useCallback(() => {
-    if (window.innerHeight + document.documentElement.scrollTop !== document.documentElement.offsetHeight) {
-      return;
-    }
+    // Check if we're near the bottom of the page (within 200px)
+    const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+    const scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
+    const clientHeight = document.documentElement.clientHeight || window.innerHeight;
     
-    if (hasMore && !isLoading && !isLoadingMore) {
+    const scrolledToBottom = scrollTop + clientHeight >= scrollHeight - 200;
+    
+    console.log('Scroll check:', {
+      scrollTop,
+      scrollHeight,
+      clientHeight,
+      scrolledToBottom,
+      hasMore,
+      isLoading,
+      isLoadingMore
+    });
+    
+    if (scrolledToBottom && hasMore && !isLoading && !isLoadingMore) {
+      console.log('Loading more news...');
       setIsLoadingMore(true);
       setPage(prev => prev + 1);
     }
@@ -115,6 +129,7 @@ const NewsFeed: React.FC<NewsFeedProps> = ({ onNewsClick }) => {
       {isLoadingMore && (
         <div className="flex justify-center py-6">
           <Loader2 className="h-6 w-6 animate-spin text-primary" />
+          <p className="ml-2 text-muted-foreground">Daha çox xəbər yüklənir...</p>
         </div>
       )}
 
