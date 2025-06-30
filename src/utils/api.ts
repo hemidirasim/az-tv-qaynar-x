@@ -20,18 +20,31 @@ export const fetchNews = async (page: number = 1, perPage: number = 11): Promise
         // Şəkil URL-ini düzgün təyin et
         let imageUrl = '/placeholder.svg';
         if (item.image_url) {
-          // URL-də encoding varsa decode et
-          const decodedUrl = decodeURIComponent(item.image_url);
-          
-          // Əgər URL artıq tam yoldursa, olduğu kimi saxla
-          if (decodedUrl.startsWith('http')) {
-            imageUrl = decodedUrl;
-          } else {
-            // Əks halda aztv.az domenini əlavə et
-            imageUrl = `https://aztv.az/${decodedUrl}`;
+          try {
+            // URL-də encoding varsa decode et
+            let decodedUrl = decodeURIComponent(item.image_url);
+            
+            // Əgər URL artıq tam yoldursa, olduğu kimi saxla
+            if (decodedUrl.startsWith('http')) {
+              imageUrl = decodedUrl;
+            } else {
+              // Əks halda aztv.az domenini əlavə et və düzgün encode et
+              // Yolu normalize et - əvvəlindəki / işarəsini çıxart
+              if (decodedUrl.startsWith('/')) {
+                decodedUrl = decodedUrl.substring(1);
+              }
+              
+              // URL-i düzgün qur və encode et
+              const fullUrl = `https://aztv.az/${decodedUrl}`;
+              // URL-dəki boşluqları və xüsusi simvolları encode et
+              imageUrl = fullUrl.replace(/\s+/g, '%20').replace(/\(/g, '%28').replace(/\)/g, '%29');
+            }
+            
+            console.log('Şəkil URL-i:', imageUrl);
+          } catch (error) {
+            console.error('Şəkil URL-ini emal edərkən xəta:', error);
+            imageUrl = '/placeholder.svg';
           }
-          
-          console.log('Şəkil URL-i:', imageUrl);
         }
         
         // Başlıq, məzmun və alt başlığı düzgün parse et
