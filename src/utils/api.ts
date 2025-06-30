@@ -12,11 +12,45 @@ export const fetchNews = async (page: number = 1, perPage: number = 11): Promise
     }
     
     const data = await response.json();
-    console.log('News API Response:', data);
+    console.log('API cavabı:', data);
     
-    return data;
+    // API cavabının strukturunu düzəlt
+    if (data.success && data.data && data.data.news) {
+      const newsData = data.data.news.data.map((item: any) => ({
+        id: item.id,
+        title: item.title?.az?.value || item.title?.az || 'Başlıq yoxdur',
+        content: item.content?.az?.value || item.content?.az || '',
+        summary: item.sub_title?.az?.value || item.sub_title?.az || '',
+        image: item.image_url ? `https://aztv.az/${item.image_url}` : '/placeholder.svg',
+        date: item.created_at,
+        created_at: item.created_at,
+        slug: item.slug || '',
+        category: ''
+      }));
+
+      return {
+        data: newsData,
+        current_page: data.data.news.current_page || 1,
+        per_page: data.data.news.per_page || perPage,
+        total: data.data.news.total || newsData.length,
+        last_page: data.data.news.last_page || 1,
+        next_page_url: data.data.news.next_page_url,
+        prev_page_url: data.data.news.prev_page_url
+      };
+    }
+    
+    // Geri dönüş üçün boş cavab
+    return {
+      data: [],
+      current_page: 1,
+      per_page: perPage,
+      total: 0,
+      last_page: 1,
+      next_page_url: null,
+      prev_page_url: null
+    };
   } catch (error) {
-    console.error('Error fetching news:', error);
+    console.error('Xəbərləri yükləyərkən xəta:', error);
     throw error;
   }
 };
