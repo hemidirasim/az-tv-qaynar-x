@@ -1,12 +1,59 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import React, { useState } from 'react';
+import { NewsItem } from '@/types/news';
+import Header from '@/components/Header';
+import NewsFeed from '@/components/NewsFeed';
+import NewsDetail from '@/components/NewsDetail';
+import LiveTV from '@/components/LiveTV';
+import Settings from '@/components/Settings';
+import BottomNavigation from '@/components/BottomNavigation';
 
 const Index = () => {
+  const [activeTab, setActiveTab] = useState<'home' | 'live' | 'settings'>('home');
+  const [selectedNews, setSelectedNews] = useState<NewsItem | null>(null);
+  const [isNewsDetailOpen, setIsNewsDetailOpen] = useState(false);
+
+  const handleNewsClick = (news: NewsItem) => {
+    setSelectedNews(news);
+    setIsNewsDetailOpen(true);
+  };
+
+  const handleCloseNewsDetail = () => {
+    setIsNewsDetailOpen(false);
+    setSelectedNews(null);
+  };
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'home':
+        return <NewsFeed onNewsClick={handleNewsClick} />;
+      case 'live':
+        return <LiveTV />;
+      case 'settings':
+        return <Settings />;
+      default:
+        return <NewsFeed onNewsClick={handleNewsClick} />;
+    }
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-muted-foreground">Start building your amazing project here!</p>
-      </div>
+    <div className="min-h-screen bg-gray-50">
+      <Header />
+      
+      <main className="pb-20">
+        {renderContent()}
+      </main>
+
+      <BottomNavigation 
+        activeTab={activeTab} 
+        onTabChange={setActiveTab} 
+      />
+
+      <NewsDetail 
+        news={selectedNews}
+        isOpen={isNewsDetailOpen}
+        onClose={handleCloseNewsDetail}
+      />
     </div>
   );
 };
