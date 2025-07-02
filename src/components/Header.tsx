@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Menu, ChevronDown, Radio } from 'lucide-react';
+import { Menu, ChevronDown } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,17 +22,6 @@ const Header = () => {
 
   return (
     <header className="bg-white shadow-lg sticky top-0 z-50 border-b border-gray-100">
-      {/* Top bar with live button */}
-      <div className="bg-gradient-to-r from-red-500 to-red-600 py-2">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-center space-x-2">
-            <Radio className="w-3 h-3 text-white" />
-            <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-            <span className="text-xs font-bold text-white tracking-wider">CANLI YAYIM</span>
-          </div>
-        </div>
-      </div>
-
       {/* Main header */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
