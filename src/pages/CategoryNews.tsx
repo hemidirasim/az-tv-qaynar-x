@@ -1,7 +1,8 @@
-import React from 'react';
+
+import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { fetchCategories, fetchNewsByCategory } from '@/utils/api';
 import NewsCard from '@/components/NewsCard';
@@ -12,6 +13,10 @@ const CategoryNews = () => {
   const navigate = useNavigate();
   
   const categoryIdNum = categoryId ? parseInt(categoryId) : null;
+  const [page, setPage] = useState(1);
+  const [allNews, setAllNews] = useState<NewsItem[]>([]);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
   const { data: categoriesData } = useQuery({
     queryKey: ['categories'],
@@ -25,11 +30,11 @@ const CategoryNews = () => {
   const categorySlug = currentCategory?.slug || '';
 
   const { data: newsData, isLoading, error, refetch } = useQuery({
-    queryKey: ['categoryNews', categoryIdNum, categorySlug],
+    queryKey: ['categoryNews', categoryIdNum, categorySlug, page],
     queryFn: () => {
-      console.log('Fetching category news for ID:', categoryIdNum, 'Slug:', categorySlug);
+      console.log('Fetching category news for ID:', categoryIdNum, 'Slug:', categorySlug, 'Page:', page);
       if (categoryIdNum) {
-        return fetchNewsByCategory(categoryIdNum, 1, 40, categorySlug);
+        return fetchNewsByCategory(categoryIdNum, page, 40, categorySlug);
       }
       throw new Error('Category ID is required');
     },
@@ -38,6 +43,57 @@ const CategoryNews = () => {
     retry: 3,
     retryDelay: 1000,
   });
+
+  // Update news when data changes
+  useEffect(() => {
+    console.log('API response received:', newsData);
+    if (newsData?.data && Array.isArray(newsData.data)) {
+      console.log('Processing news data:', newsData.data.length, 'items');
+      if (page === 1) {
+        setAllNews(newsData.data);
+      } else {
+        setAllNews(prev => [...prev, ...newsData.data]);
+      }
+      
+      setHasMore(newsData.current_page < newsData.last_page);
+      setIsLoadingMore(false);
+    } else {
+      console.log('No valid news data received');
+      if (page === 1) {
+        setAllNews([]);
+      }
+      setIsLoadingMore(false);
+    }
+  }, [newsData, page]);
+
+  // Reset when category changes
+  useEffect(() => {
+    console.log('Category changed to:', categoryIdNum, categoryName);
+    setPage(1);
+    setAllNews([]);
+    setHasMore(true);
+    setIsLoadingMore(false);
+  }, [categoryIdNum]);
+
+  // Infinite scroll handler
+  const handleScroll = useCallback(() => {
+    const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+    const scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
+    const clientHeight = document.documentElement.clientHeight || window.innerHeight;
+    
+    const scrolledToBottom = scrollTop + clientHeight >= scrollHeight - 200;
+    
+    if (scrolledToBottom && hasMore && !isLoading && !isLoadingMore) {
+      console.log('Loading more news...');
+      setIsLoadingMore(true);
+      setPage(prev => prev + 1);
+    }
+  }, [hasMore, isLoading, isLoadingMore]);
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [handleScroll]);
 
   const handleNewsClick = (news: NewsItem) => {
     console.log('News clicked:', news);
@@ -49,10 +105,13 @@ const CategoryNews = () => {
 
   const handleRetry = () => {
     console.log('Retrying category news fetch...');
+    setPage(1);
+    setAllNews([]);
+    setIsLoadingMore(false);
     refetch();
   };
 
-  if (isLoading) {
+  if (isLoading && page === 1) {
     return (
       <div className="min-h-screen bg-gray-50">
         <div className="sticky top-0 z-50 bg-white border-b px-4 py-3">
@@ -103,8 +162,6 @@ const CategoryNews = () => {
     );
   }
 
-  const news = newsData?.data || [];
-
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
       {/* Header */}
@@ -115,27 +172,41 @@ const CategoryNews = () => {
           </Button>
           <div>
             <h1 className="text-lg font-semibold">{categoryName}</h1>
-            <p className="text-sm text-gray-600">{news.length} xəbər</p>
+            <p className="text-sm text-gray-600">{allNews.length} xəbər</p>
           </div>
         </div>
       </div>
 
       {/* Content */}
       <div className="px-4 py-6">
-        {news.length === 0 ? (
+        {allNews.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-gray-600 mb-4">Bu kateqoriyada xəbər yoxdur</p>
             <p className="text-sm text-gray-500">Kateqoriya ID: {categoryIdNum}</p>
           </div>
         ) : (
           <div className="space-y-6">
-            {news.map((newsItem, index) => (
+            {allNews.map((newsItem, index) => (
               <NewsCard 
                 key={`${newsItem.id}-${index}`}
                 news={newsItem}
                 onClick={() => handleNewsClick(newsItem)}
               />
             ))}
+          </div>
+        )}
+
+        {/* Loading indicator for infinite scroll */}
+        {isLoadingMore && (
+          <div className="flex justify-center py-6">
+            <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            <p className="ml-2 text-gray-600">Daha çox xəbər yüklənir...</p>
+          </div>
+        )}
+
+        {!hasMore && allNews.length > 0 && (
+          <div className="text-center py-6">
+            <p className="text-gray-500 text-sm">Bütün xəbərlər yükləndi</p>
           </div>
         )}
       </div>
