@@ -1,13 +1,15 @@
 
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Menu, ChevronDown } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Menu, ChevronDown, Home } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Button } from '@/components/ui/button';
 import { fetchCategories } from '@/utils/api';
 import { Category } from '@/types/category';
 
@@ -16,28 +18,30 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ onCategorySelect }) => {
+  const navigate = useNavigate();
+  
   const { data: categoriesData, isLoading: categoriesLoading, error: categoriesError } = useQuery({
     queryKey: ['categories'],
     queryFn: fetchCategories,
-    staleTime: 10 * 60 * 1000, // 10 minutes
+    staleTime: 10 * 60 * 1000,
   });
-
-  console.log('Categories data:', categoriesData);
-  console.log('Categories loading:', categoriesLoading);
-  console.log('Categories error:', categoriesError);
 
   const categories = categoriesData?.data?.categories || [];
 
   const handleCategoryClick = (category: Category | null) => {
-    console.log('Category clicked:', category);
-    if (onCategorySelect) {
-      onCategorySelect(category?.id || null, category?.name || 'Bütün Xəbərlər');
+    if (category) {
+      navigate(`/category/${category.id}`);
+    } else {
+      navigate('/');
     }
+  };
+
+  const handleHomeClick = () => {
+    navigate('/');
   };
 
   return (
     <header className="bg-white shadow-lg sticky top-0 z-50 border-b border-gray-100">
-      {/* Main header */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center space-x-4">
@@ -64,7 +68,18 @@ const Header: React.FC<HeaderProps> = ({ onCategorySelect }) => {
             </div>
           </div>
           
-          <div className="flex items-center">
+          <div className="flex items-center space-x-2">
+            {/* Home Button */}
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={handleHomeClick}
+              className="flex items-center space-x-2"
+            >
+              <Home className="w-4 h-4" />
+              <span className="hidden sm:block">Xəbərlər</span>
+            </Button>
+
             {/* Menu Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 transition-colors duration-200">
