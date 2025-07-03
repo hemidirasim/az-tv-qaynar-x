@@ -100,17 +100,21 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans antialiased;
+    @apply bg-white text-foreground font-sans antialiased;
+  }
+
+  html {
+    @apply bg-white;
   }
 }
 
 /* Custom AzTV styles */
 .aztv-gradient {
-  background: linear-gradient(135deg, hsl(var(--aztv-primary)), hsl(var(--aztv-secondary)));
+  background: linear-gradient(135deg, hsl(219, 39%, 119%), hsl(239, 68%, 68%));
 }
 
 .aztv-text-gradient {
-  background: linear-gradient(135deg, hsl(var(--aztv-primary)), hsl(var(--aztv-secondary)));
+  background: linear-gradient(135deg, hsl(219, 39%, 119%), hsl(239, 68%, 68%));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
