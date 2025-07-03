@@ -53,17 +53,7 @@ const Header: React.FC<HeaderProps> = ({ onCategorySelect }) => {
                 }}
               />
             </div>
-            <div className="hidden sm:block">
-              <h1 className="text-2xl font-bold text-slate-800 cursor-pointer" onClick={() => navigate('/')}>
-                AzTV
-              </h1>
-              <p className="text-xs text-slate-600 -mt-1 font-medium">Rəsmi Mobil Tətbiq</p>
-            </div>
-            <div className="block sm:hidden">
-              <h1 className="text-xl font-bold text-slate-800 cursor-pointer" onClick={() => navigate('/')}>
-                AzTV
-              </h1>
-            </div>
+          
           </div>
           
           <div className="flex items-center space-x-2">
