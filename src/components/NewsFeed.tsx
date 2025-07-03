@@ -119,7 +119,7 @@ const NewsFeed: React.FC<NewsFeedProps> = ({ onNewsClick, selectedCategoryId, ca
       {/* Category title */}
       {categoryName && (
         <div className="px-4 pt-4">
-          <h2 className="text-xl font-bold text-slate-800">{categoryName}</h2>
+          <h2 className="text-xl font-bold text-slate-800">{String(categoryName)}</h2>
           <p className="text-sm text-slate-600">
             {selectedCategoryId ? `Kateqoriya ID: ${selectedCategoryId}` : 'Bütün xəbərlər'}
           </p>

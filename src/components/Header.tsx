@@ -72,36 +72,38 @@ const Header: React.FC<HeaderProps> = ({ onCategorySelect }) => {
                 <span className="text-sm font-medium text-slate-700 hidden sm:block">Kateqoriyalar</span>
                 <ChevronDown className="w-4 h-4 text-slate-700" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-72 sm:w-80 bg-white shadow-xl border border-gray-200 max-h-96 overflow-y-auto z-50">
+              <DropdownMenuContent className="w-80 bg-white shadow-xl border border-gray-200 max-h-96 overflow-y-auto z-50">
                 <DropdownMenuItem 
                   key="all"
-                  className="cursor-pointer hover:bg-slate-50 focus:bg-slate-50 text-slate-700 font-medium px-3 py-2"
+                  className="cursor-pointer hover:bg-slate-50 focus:bg-slate-50 text-slate-700 font-medium px-4 py-3"
                   onClick={() => handleCategoryClick(null)}
                 >
-                  Bütün Xəbərlər
+                  <span className="block w-full">Bütün Xəbərlər</span>
                 </DropdownMenuItem>
                 {categoriesLoading && (
-                  <DropdownMenuItem className="px-3 py-2 text-slate-500">
-                    Kateqoriyalar yüklənir...
+                  <DropdownMenuItem className="px-4 py-3 text-slate-500">
+                    <span className="block w-full">Kateqoriyalar yüklənir...</span>
                   </DropdownMenuItem>
                 )}
                 {categoriesError && (
-                  <DropdownMenuItem className="px-3 py-2 text-red-500">
-                    Kateqoriyalar yüklənə bilmədi
+                  <DropdownMenuItem className="px-4 py-3 text-red-500">
+                    <span className="block w-full">Kateqoriyalar yüklənə bilmədi</span>
                   </DropdownMenuItem>
                 )}
                 {categories.length > 0 && categories.map((category) => (
                   <DropdownMenuItem 
                     key={category.id}
-                    className="cursor-pointer hover:bg-slate-50 focus:bg-slate-50 text-slate-700 font-medium px-3 py-2 whitespace-normal"
+                    className="cursor-pointer hover:bg-slate-50 focus:bg-slate-50 text-slate-700 font-medium px-4 py-3"
                     onClick={() => handleCategoryClick(category)}
                   >
-                    {category.name}
+                    <span className="block w-full whitespace-normal break-words leading-relaxed">
+                      {String(category.name)}
+                    </span>
                   </DropdownMenuItem>
                 ))}
                 {!categoriesLoading && !categoriesError && categories.length === 0 && (
-                  <DropdownMenuItem className="px-3 py-2 text-slate-500">
-                    Kateqoriya tapılmadı
+                  <DropdownMenuItem className="px-4 py-3 text-slate-500">
+                    <span className="block w-full">Kateqoriya tapılmadı</span>
                   </DropdownMenuItem>
                 )}
               </DropdownMenuContent>

@@ -17,32 +17,50 @@ export const fetchCategories = async (): Promise<CategoryResponse> => {
     
     // API cavabının strukturunu düzgün parse et
     if (data.success && data.data) {
-      // Əgər data.data birbaşa array-dursa
+      let categories = [];
+      
+      // Müxtəlif strukturları yoxla
       if (Array.isArray(data.data)) {
-        return {
-          success: true,
-          data: {
-            categories: data.data.map((item: any) => ({
-              id: item.id,
-              name: item.name || item.title || 'Adı yoxdur',
-              slug: item.slug || ''
-            }))
-          }
-        };
+        categories = data.data;
+      } else if (data.data.categories && Array.isArray(data.data.categories)) {
+        categories = data.data.categories;
+      } else if (data.data.data && Array.isArray(data.data.data)) {
+        categories = data.data.data;
       }
-      // Əgər data.data.categories array-dursa
-      else if (data.data.categories && Array.isArray(data.data.categories)) {
-        return {
-          success: true,
-          data: {
-            categories: data.data.categories.map((item: any) => ({
-              id: item.id,
-              name: item.name || item.title || 'Adı yoxdur',
-              slug: item.slug || ''
-            }))
+      
+      const processedCategories = categories.map((item: any) => {
+        // Ad field-ini düzgün parse et
+        let categoryName = 'Adı yoxdur';
+        
+        if (item.name) {
+          if (typeof item.name === 'string') {
+            categoryName = item.name;
+          } else if (typeof item.name === 'object' && item.name.az) {
+            categoryName = typeof item.name.az === 'string' ? item.name.az : item.name.az.value || 'Adı yoxdur';
           }
+        } else if (item.title) {
+          if (typeof item.title === 'string') {
+            categoryName = item.title;
+          } else if (typeof item.title === 'object' && item.title.az) {
+            categoryName = typeof item.title.az === 'string' ? item.title.az : item.title.az.value || 'Adı yoxdur';
+          }
+        }
+        
+        return {
+          id: item.id,
+          name: categoryName,
+          slug: item.slug || ''
         };
-      }
+      });
+      
+      console.log('Processed categories:', processedCategories);
+      
+      return {
+        success: true,
+        data: {
+          categories: processedCategories
+        }
+      };
     }
     
     // Geri dönüş üçün boş cavab
@@ -97,12 +115,12 @@ export const fetchNewsByCategory = async (categoryId: number, page: number = 1, 
         }
         
         // Başlıq, məzmun və alt başlığı düzgün parse et
-        const parseField = (field: any) => {
+        const parseField = (field: any): string => {
           if (!field) return '';
           if (typeof field === 'string') return field;
-          if (field.az) {
+          if (typeof field === 'object' && field.az) {
             if (typeof field.az === 'string') return field.az;
-            if (field.az.value && field.az.value !== '[Max depth of 5 reached]') {
+            if (field.az.value && typeof field.az.value === 'string' && field.az.value !== '[Max depth of 5 reached]') {
               return field.az.value;
             }
           }
