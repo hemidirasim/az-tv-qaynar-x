@@ -1,8 +1,7 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { NewsItem } from '@/types/news';
-import { fetchNews, fetchNewsByCategory } from '@/utils/api';
+import { fetchNews, fetchNewsByCategory, fetchCategories } from '@/utils/api';
 import NewsCard from './NewsCard';
 import { Button } from '@/components/ui/button';
 import { Loader2, RefreshCw } from 'lucide-react';
@@ -19,6 +18,17 @@ const NewsFeed: React.FC<NewsFeedProps> = ({ onNewsClick, selectedCategoryId, ca
   const [hasMore, setHasMore] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
+  // Get categories to find the slug
+  const { data: categoriesData } = useQuery({
+    queryKey: ['categories'],
+    queryFn: fetchCategories,
+    staleTime: 10 * 60 * 1000,
+  });
+
+  const categories = categoriesData?.data?.categories || [];
+  const currentCategory = categories.find(cat => cat.id === selectedCategoryId);
+  const categorySlug = currentCategory?.slug || '';
+
   // Reset when category changes
   useEffect(() => {
     console.log('Category changed to:', selectedCategoryId, categoryName);
@@ -29,11 +39,11 @@ const NewsFeed: React.FC<NewsFeedProps> = ({ onNewsClick, selectedCategoryId, ca
   }, [selectedCategoryId]);
 
   const { data, isLoading, error, refetch, isRefetching } = useQuery({
-    queryKey: ['news', selectedCategoryId, page],
+    queryKey: ['news', selectedCategoryId, page, categorySlug],
     queryFn: () => {
-      console.log('Fetching news - Category ID:', selectedCategoryId, 'Page:', page);
+      console.log('Fetching news - Category ID:', selectedCategoryId, 'Slug:', categorySlug, 'Page:', page);
       if (selectedCategoryId && selectedCategoryId !== null) {
-        return fetchNewsByCategory(selectedCategoryId, page);
+        return fetchNewsByCategory(selectedCategoryId, page, 40, categorySlug);
       } else {
         return fetchNews(page);
       }

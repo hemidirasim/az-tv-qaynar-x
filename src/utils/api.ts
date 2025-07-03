@@ -75,12 +75,17 @@ export const fetchCategories = async (): Promise<CategoryResponse> => {
   }
 };
 
-export const fetchNewsByCategory = async (categoryId: number, page: number = 1, perPage: number = 40): Promise<NewsResponse> => {
+export const fetchNewsByCategory = async (categoryId: number, page: number = 1, perPage: number = 40, categorySlug?: string): Promise<NewsResponse> => {
   try {
-    // API URL formatını düzəlt - /official hissəsini çıxaraq
-    const response = await fetch(`${API_BASE_URL}/news/category/${categoryId}?per_page=${perPage}&page=${page}`);
+    // URL formatını düzəlt - həm ID həm də slug istifadə et
+    const url = categorySlug 
+      ? `${API_BASE_URL}/news/category/${categoryId}/${categorySlug}?per_page=${perPage}&page=${page}`
+      : `${API_BASE_URL}/news/category/${categoryId}?per_page=${perPage}&page=${page}`;
     
-    console.log('Category API URL:', `${API_BASE_URL}/news/category/${categoryId}?per_page=${perPage}&page=${page}`);
+    console.log('Category API URL:', url);
+    
+    const response = await fetch(url);
+    
     console.log('Response status:', response.status);
     console.log('Response headers:', response.headers);
     

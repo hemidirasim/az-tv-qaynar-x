@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -20,12 +19,17 @@ const CategoryNews = () => {
     staleTime: 10 * 60 * 1000,
   });
 
+  const categories = categoriesData?.data?.categories || [];
+  const currentCategory = categories.find(cat => cat.id === categoryIdNum);
+  const categoryName = currentCategory?.name || 'Kateqoriya';
+  const categorySlug = currentCategory?.slug || '';
+
   const { data: newsData, isLoading, error, refetch } = useQuery({
-    queryKey: ['categoryNews', categoryIdNum],
+    queryKey: ['categoryNews', categoryIdNum, categorySlug],
     queryFn: () => {
-      console.log('Fetching category news for ID:', categoryIdNum);
+      console.log('Fetching category news for ID:', categoryIdNum, 'Slug:', categorySlug);
       if (categoryIdNum) {
-        return fetchNewsByCategory(categoryIdNum);
+        return fetchNewsByCategory(categoryIdNum, 1, 40, categorySlug);
       }
       throw new Error('Category ID is required');
     },
@@ -34,10 +38,6 @@ const CategoryNews = () => {
     retry: 3,
     retryDelay: 1000,
   });
-
-  const categories = categoriesData?.data?.categories || [];
-  const currentCategory = categories.find(cat => cat.id === categoryIdNum);
-  const categoryName = currentCategory?.name || 'Kateqoriya';
 
   const handleNewsClick = (news: NewsItem) => {
     console.log('News clicked:', news);
