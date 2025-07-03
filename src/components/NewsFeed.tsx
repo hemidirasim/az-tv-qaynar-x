@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { NewsItem } from '@/types/news';
@@ -126,16 +127,6 @@ const NewsFeed: React.FC<NewsFeedProps> = ({ onNewsClick, selectedCategoryId, ca
 
   return (
     <div className="space-y-6">
-      {/* Category title */}
-      {categoryName && (
-        <div className="px-4 pt-4">
-          <h2 className="text-xl font-bold text-slate-800">{String(categoryName)}</h2>
-          <p className="text-sm text-slate-600">
-            {selectedCategoryId ? `Kateqoriya ID: ${selectedCategoryId}` : 'Bütün xəbərlər'}
-          </p>
-        </div>
-      )}
-
       {/* Pull to refresh indicator */}
       <div className="flex justify-center py-2">
         <Button 
