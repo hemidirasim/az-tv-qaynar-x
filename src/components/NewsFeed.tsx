@@ -21,7 +21,7 @@ const NewsFeed: React.FC<NewsFeedProps> = ({ onNewsClick, selectedCategoryId, ca
 
   // Reset when category changes
   useEffect(() => {
-    console.log('Category changed:', selectedCategoryId, categoryName);
+    console.log('Category changed to:', selectedCategoryId, categoryName);
     setPage(1);
     setAllNews([]);
     setHasMore(true);
@@ -31,7 +31,7 @@ const NewsFeed: React.FC<NewsFeedProps> = ({ onNewsClick, selectedCategoryId, ca
   const { data, isLoading, error, refetch, isRefetching } = useQuery({
     queryKey: ['news', selectedCategoryId, page],
     queryFn: () => {
-      console.log('Fetching news for category:', selectedCategoryId, 'page:', page);
+      console.log('Fetching news - Category ID:', selectedCategoryId, 'Page:', page);
       if (selectedCategoryId && selectedCategoryId !== null) {
         return fetchNewsByCategory(selectedCategoryId, page);
       } else {
@@ -44,6 +44,7 @@ const NewsFeed: React.FC<NewsFeedProps> = ({ onNewsClick, selectedCategoryId, ca
   useEffect(() => {
     console.log('API response received:', data);
     if (data?.data && Array.isArray(data.data)) {
+      console.log('Processing news data:', data.data.length, 'items');
       if (page === 1) {
         setAllNews(data.data);
       } else {
@@ -51,6 +52,12 @@ const NewsFeed: React.FC<NewsFeedProps> = ({ onNewsClick, selectedCategoryId, ca
       }
       
       setHasMore(data.current_page < data.last_page);
+      setIsLoadingMore(false);
+    } else {
+      console.log('No valid news data received');
+      if (page === 1) {
+        setAllNews([]);
+      }
       setIsLoadingMore(false);
     }
   }, [data, page]);
@@ -77,6 +84,7 @@ const NewsFeed: React.FC<NewsFeedProps> = ({ onNewsClick, selectedCategoryId, ca
   }, [handleScroll]);
 
   const handleRefresh = () => {
+    console.log('Refreshing news feed');
     setPage(1);
     setAllNews([]);
     setIsLoadingMore(false);

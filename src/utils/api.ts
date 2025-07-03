@@ -13,9 +13,45 @@ export const fetchCategories = async (): Promise<CategoryResponse> => {
     }
     
     const data = await response.json();
-    console.log('Kateqoriya API cavabı:', data);
+    console.log('Categories API raw response:', data);
     
-    return data;
+    // API cavabının strukturunu düzgün parse et
+    if (data.success && data.data) {
+      // Əgər data.data birbaşa array-dursa
+      if (Array.isArray(data.data)) {
+        return {
+          success: true,
+          data: {
+            categories: data.data.map((item: any) => ({
+              id: item.id,
+              name: item.name || item.title || 'Adı yoxdur',
+              slug: item.slug || ''
+            }))
+          }
+        };
+      }
+      // Əgər data.data.categories array-dursa
+      else if (data.data.categories && Array.isArray(data.data.categories)) {
+        return {
+          success: true,
+          data: {
+            categories: data.data.categories.map((item: any) => ({
+              id: item.id,
+              name: item.name || item.title || 'Adı yoxdur',
+              slug: item.slug || ''
+            }))
+          }
+        };
+      }
+    }
+    
+    // Geri dönüş üçün boş cavab
+    return {
+      success: false,
+      data: {
+        categories: []
+      }
+    };
   } catch (error) {
     console.error('Kateqoriyaları yükləyərkən xəta:', error);
     throw error;
@@ -31,31 +67,33 @@ export const fetchNewsByCategory = async (categoryId: number, page: number = 1, 
     }
     
     const data = await response.json();
-    console.log('Kateqoriya xəbərləri API cavabı:', data);
+    console.log('Category news API raw response:', data);
     
     // API cavabının strukturunu düzəlt
-    if (data.success && data.data && data.data.news) {
-      const newsData = data.data.news.data.map((item: any) => {
+    if (data.success && data.data) {
+      let newsData = [];
+      
+      // Müxtəlif strukturları yoxla
+      if (data.data.news && Array.isArray(data.data.news.data)) {
+        newsData = data.data.news.data;
+      } else if (data.data.news && Array.isArray(data.data.news)) {
+        newsData = data.data.news;
+      } else if (Array.isArray(data.data)) {
+        newsData = data.data;
+      }
+      
+      const processedNews = newsData.map((item: any) => {
         // Şəkil URL-ini düzgün təyin et
         let imageUrl = '/placeholder.svg';
         
-        console.log('Orijinal şəkil URL-i:', item.image_url);
-        
         if (item.image_url && item.image_url.trim() !== '') {
-          // Əgər URL artıq tam path-dursa (http/https ilə başlayır)
           if (item.image_url.startsWith('http://') || item.image_url.startsWith('https://')) {
             imageUrl = item.image_url;
-          } 
-          // Əgər URL '/' ilə başlayırsa - admin.aztv.az əlavə et  
-          else if (item.image_url.startsWith('/')) {
+          } else if (item.image_url.startsWith('/')) {
             imageUrl = `https://admin.aztv.az${item.image_url}`;
-          }
-          // Əks halda - admin.aztv.az/ əlavə et
-          else {
+          } else {
             imageUrl = `https://admin.aztv.az/${item.image_url}`;
           }
-          
-          console.log('Düzəldilmiş şəkil URL-i:', imageUrl);
         }
         
         // Başlıq, məzmun və alt başlığı düzgün parse et
@@ -85,13 +123,13 @@ export const fetchNewsByCategory = async (categoryId: number, page: number = 1, 
       });
 
       return {
-        data: newsData,
-        current_page: data.data.news.current_page || 1,
-        per_page: data.data.news.per_page || perPage,
-        total: data.data.news.total || newsData.length,
-        last_page: data.data.news.last_page || 1,
-        next_page_url: data.data.news.next_page_url,
-        prev_page_url: data.data.news.prev_page_url
+        data: processedNews,
+        current_page: data.data.news?.current_page || 1,
+        per_page: data.data.news?.per_page || perPage,
+        total: data.data.news?.total || processedNews.length,
+        last_page: data.data.news?.last_page || 1,
+        next_page_url: data.data.news?.next_page_url || null,
+        prev_page_url: data.data.news?.prev_page_url || null
       };
     }
     

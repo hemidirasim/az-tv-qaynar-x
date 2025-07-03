@@ -16,11 +16,15 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = ({ onCategorySelect }) => {
-  const { data: categoriesData } = useQuery({
+  const { data: categoriesData, isLoading: categoriesLoading, error: categoriesError } = useQuery({
     queryKey: ['categories'],
     queryFn: fetchCategories,
     staleTime: 10 * 60 * 1000, // 10 minutes
   });
+
+  console.log('Categories data:', categoriesData);
+  console.log('Categories loading:', categoriesLoading);
+  console.log('Categories error:', categoriesError);
 
   const categories = categoriesData?.data?.categories || [];
 
@@ -68,7 +72,7 @@ const Header: React.FC<HeaderProps> = ({ onCategorySelect }) => {
                 <span className="text-sm font-medium text-slate-700 hidden sm:block">Kateqoriyalar</span>
                 <ChevronDown className="w-4 h-4 text-slate-700" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-72 sm:w-80 bg-white shadow-xl border border-gray-200 max-h-96 overflow-y-auto">
+              <DropdownMenuContent className="w-72 sm:w-80 bg-white shadow-xl border border-gray-200 max-h-96 overflow-y-auto z-50">
                 <DropdownMenuItem 
                   key="all"
                   className="cursor-pointer hover:bg-slate-50 focus:bg-slate-50 text-slate-700 font-medium px-3 py-2"
@@ -76,7 +80,17 @@ const Header: React.FC<HeaderProps> = ({ onCategorySelect }) => {
                 >
                   Bütün Xəbərlər
                 </DropdownMenuItem>
-                {categories.map((category) => (
+                {categoriesLoading && (
+                  <DropdownMenuItem className="px-3 py-2 text-slate-500">
+                    Kateqoriyalar yüklənir...
+                  </DropdownMenuItem>
+                )}
+                {categoriesError && (
+                  <DropdownMenuItem className="px-3 py-2 text-red-500">
+                    Kateqoriyalar yüklənə bilmədi
+                  </DropdownMenuItem>
+                )}
+                {categories.length > 0 && categories.map((category) => (
                   <DropdownMenuItem 
                     key={category.id}
                     className="cursor-pointer hover:bg-slate-50 focus:bg-slate-50 text-slate-700 font-medium px-3 py-2 whitespace-normal"
@@ -85,6 +99,11 @@ const Header: React.FC<HeaderProps> = ({ onCategorySelect }) => {
                     {category.name}
                   </DropdownMenuItem>
                 ))}
+                {!categoriesLoading && !categoriesError && categories.length === 0 && (
+                  <DropdownMenuItem className="px-3 py-2 text-slate-500">
+                    Kateqoriya tapılmadı
+                  </DropdownMenuItem>
+                )}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
