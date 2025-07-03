@@ -81,13 +81,6 @@ const Header: React.FC<HeaderProps> = ({ onCategorySelect }) => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-80 bg-white shadow-xl border border-gray-200 max-h-96 overflow-y-auto z-50">
-                <DropdownMenuItem 
-                  key="all"
-                  className="cursor-pointer hover:bg-slate-50 focus:bg-slate-50 text-slate-700 font-medium px-4 py-3"
-                  onClick={() => handleCategoryClick(null)}
-                >
-                  <span className="block w-full">Bütün Xəbərlər</span>
-                </DropdownMenuItem>
                 {categoriesLoading && (
                   <DropdownMenuItem className="px-4 py-3 text-slate-500">
                     <span className="block w-full">Kateqoriyalar yüklənir...</span>
