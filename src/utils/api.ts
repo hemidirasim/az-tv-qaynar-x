@@ -1,4 +1,3 @@
-
 import { NewsResponse } from '@/types/news';
 import { CategoryResponse } from '@/types/category';
 
@@ -78,10 +77,25 @@ export const fetchCategories = async (): Promise<CategoryResponse> => {
 
 export const fetchNewsByCategory = async (categoryId: number, page: number = 1, perPage: number = 40): Promise<NewsResponse> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/news/category/${categoryId}/official?per_page=${perPage}&page=${page}`);
+    // API URL formatını düzəlt - /official hissəsini çıxaraq
+    const response = await fetch(`${API_BASE_URL}/news/category/${categoryId}?per_page=${perPage}&page=${page}`);
+    
+    console.log('Category API URL:', `${API_BASE_URL}/news/category/${categoryId}?per_page=${perPage}&page=${page}`);
+    console.log('Response status:', response.status);
+    console.log('Response headers:', response.headers);
     
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    // İlk öncə content-type yoxla
+    const contentType = response.headers.get('content-type');
+    console.log('Content-Type:', contentType);
+    
+    if (!contentType || !contentType.includes('application/json')) {
+      const textResponse = await response.text();
+      console.log('Non-JSON response received:', textResponse.substring(0, 200));
+      throw new Error('Server HTML cavabı qaytardı, JSON gözlənilirdi');
     }
     
     const data = await response.json();
