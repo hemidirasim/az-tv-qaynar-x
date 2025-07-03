@@ -83,7 +83,7 @@ const NewsDetail: React.FC<NewsDetailProps> = ({ news, isOpen, onClose }) => {
               </DropdownMenuItem>
               <DropdownMenuItem onClick={handleTwitterShare} className="flex items-center gap-2 cursor-pointer">
                 <div className="w-4 h-4 bg-blue-400 rounded-sm flex items-center justify-center">
-                  <span className="text-white text-xs font-bold">T</span>
+                  <span className="text-white text-xs font-bold">X</span>
                 </div>
                 X 
               </DropdownMenuItem>
