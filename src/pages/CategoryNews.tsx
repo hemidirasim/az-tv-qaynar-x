@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
@@ -6,6 +5,7 @@ import { ArrowLeft, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { fetchCategories, fetchNewsByCategory } from '@/utils/api';
 import NewsCard from '@/components/NewsCard';
+import NewsDetail from '@/components/NewsDetail';
 import { NewsItem } from '@/types/news';
 
 const CategoryNews = () => {
@@ -17,6 +17,8 @@ const CategoryNews = () => {
   const [allNews, setAllNews] = useState<NewsItem[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [selectedNews, setSelectedNews] = useState<NewsItem | null>(null);
+  const [isNewsDetailOpen, setIsNewsDetailOpen] = useState(false);
 
   const { data: categoriesData } = useQuery({
     queryKey: ['categories'],
@@ -44,7 +46,6 @@ const CategoryNews = () => {
     retryDelay: 1000,
   });
 
-  // Update news when data changes
   useEffect(() => {
     console.log('API response received:', newsData);
     if (newsData?.data && Array.isArray(newsData.data)) {
@@ -66,7 +67,6 @@ const CategoryNews = () => {
     }
   }, [newsData, page]);
 
-  // Reset when category changes
   useEffect(() => {
     console.log('Category changed to:', categoryIdNum, categoryName);
     setPage(1);
@@ -75,7 +75,6 @@ const CategoryNews = () => {
     setIsLoadingMore(false);
   }, [categoryIdNum]);
 
-  // Infinite scroll handler
   const handleScroll = useCallback(() => {
     const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
     const scrollHeight = document.documentElement.scrollHeight || document.body.scrollHeight;
@@ -97,6 +96,13 @@ const CategoryNews = () => {
 
   const handleNewsClick = (news: NewsItem) => {
     console.log('News clicked:', news);
+    setSelectedNews(news);
+    setIsNewsDetailOpen(true);
+  };
+
+  const handleCloseNewsDetail = () => {
+    setIsNewsDetailOpen(false);
+    setSelectedNews(null);
   };
 
   const handleBack = () => {
@@ -210,6 +216,13 @@ const CategoryNews = () => {
           </div>
         )}
       </div>
+
+      {/* News Detail Modal */}
+      <NewsDetail 
+        news={selectedNews}
+        isOpen={isNewsDetailOpen}
+        onClose={handleCloseNewsDetail}
+      />
     </div>
   );
 };
