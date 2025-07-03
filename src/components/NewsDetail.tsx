@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { NewsItem } from '@/types/news';
 import { Button } from '@/components/ui/button';
@@ -24,7 +23,8 @@ const NewsDetail: React.FC<NewsDetailProps> = ({ news, isOpen, onClose }) => {
     e.currentTarget.src = '/placeholder.svg';
   };
 
-  const shareUrl = window.location.origin + `#news-${news.id}`;
+  // Use actual AZTV website URL structure
+  const shareUrl = `https://aztv.az/az/news/${news.id}/${news.slug}`;
   const shareText = `${news.title} - ${news.summary}`;
 
   const handleWhatsAppShare = () => {
