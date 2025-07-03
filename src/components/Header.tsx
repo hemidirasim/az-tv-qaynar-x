@@ -25,6 +25,7 @@ const Header: React.FC<HeaderProps> = ({ onCategorySelect }) => {
   const categories = categoriesData?.data?.categories || [];
 
   const handleCategoryClick = (category: Category | null) => {
+    console.log('Category clicked:', category);
     if (onCategorySelect) {
       onCategorySelect(category?.id || null, category?.name || 'Bütün Xəbərlər');
     }
@@ -67,10 +68,10 @@ const Header: React.FC<HeaderProps> = ({ onCategorySelect }) => {
                 <span className="text-sm font-medium text-slate-700 hidden sm:block">Kateqoriyalar</span>
                 <ChevronDown className="w-4 h-4 text-slate-700" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-48 bg-white shadow-xl border border-gray-200">
+              <DropdownMenuContent className="w-72 sm:w-80 bg-white shadow-xl border border-gray-200 max-h-96 overflow-y-auto">
                 <DropdownMenuItem 
                   key="all"
-                  className="cursor-pointer hover:bg-slate-50 focus:bg-slate-50 text-slate-700 font-medium"
+                  className="cursor-pointer hover:bg-slate-50 focus:bg-slate-50 text-slate-700 font-medium px-3 py-2"
                   onClick={() => handleCategoryClick(null)}
                 >
                   Bütün Xəbərlər
@@ -78,7 +79,7 @@ const Header: React.FC<HeaderProps> = ({ onCategorySelect }) => {
                 {categories.map((category) => (
                   <DropdownMenuItem 
                     key={category.id}
-                    className="cursor-pointer hover:bg-slate-50 focus:bg-slate-50 text-slate-700 font-medium"
+                    className="cursor-pointer hover:bg-slate-50 focus:bg-slate-50 text-slate-700 font-medium px-3 py-2 whitespace-normal"
                     onClick={() => handleCategoryClick(category)}
                   >
                     {category.name}

@@ -21,6 +21,7 @@ const NewsFeed: React.FC<NewsFeedProps> = ({ onNewsClick, selectedCategoryId, ca
 
   // Reset when category changes
   useEffect(() => {
+    console.log('Category changed:', selectedCategoryId, categoryName);
     setPage(1);
     setAllNews([]);
     setHasMore(true);
@@ -30,7 +31,8 @@ const NewsFeed: React.FC<NewsFeedProps> = ({ onNewsClick, selectedCategoryId, ca
   const { data, isLoading, error, refetch, isRefetching } = useQuery({
     queryKey: ['news', selectedCategoryId, page],
     queryFn: () => {
-      if (selectedCategoryId) {
+      console.log('Fetching news for category:', selectedCategoryId, 'page:', page);
+      if (selectedCategoryId && selectedCategoryId !== null) {
         return fetchNewsByCategory(selectedCategoryId, page);
       } else {
         return fetchNews(page);
@@ -40,6 +42,7 @@ const NewsFeed: React.FC<NewsFeedProps> = ({ onNewsClick, selectedCategoryId, ca
   });
 
   useEffect(() => {
+    console.log('API response received:', data);
     if (data?.data && Array.isArray(data.data)) {
       if (page === 1) {
         setAllNews(data.data);
@@ -60,16 +63,6 @@ const NewsFeed: React.FC<NewsFeedProps> = ({ onNewsClick, selectedCategoryId, ca
     const clientHeight = document.documentElement.clientHeight || window.innerHeight;
     
     const scrolledToBottom = scrollTop + clientHeight >= scrollHeight - 200;
-    
-    console.log('Scroll check:', {
-      scrollTop,
-      scrollHeight,
-      clientHeight,
-      scrolledToBottom,
-      hasMore,
-      isLoading,
-      isLoadingMore
-    });
     
     if (scrolledToBottom && hasMore && !isLoading && !isLoadingMore) {
       console.log('Loading more news...');
@@ -119,6 +112,9 @@ const NewsFeed: React.FC<NewsFeedProps> = ({ onNewsClick, selectedCategoryId, ca
       {categoryName && (
         <div className="px-4 pt-4">
           <h2 className="text-xl font-bold text-slate-800">{categoryName}</h2>
+          <p className="text-sm text-slate-600">
+            {selectedCategoryId ? `Kateqoriya ID: ${selectedCategoryId}` : 'Bütün xəbərlər'}
+          </p>
         </div>
       )}
 
@@ -165,6 +161,9 @@ const NewsFeed: React.FC<NewsFeedProps> = ({ onNewsClick, selectedCategoryId, ca
       {Array.isArray(allNews) && allNews.length === 0 && !isLoading && (
         <div className="text-center py-12">
           <p className="text-muted-foreground">Xəbər tapılmadı</p>
+          {selectedCategoryId && (
+            <p className="text-sm text-slate-500 mt-2">Bu kateqoriyada xəbər yoxdur</p>
+          )}
         </div>
       )}
     </div>
