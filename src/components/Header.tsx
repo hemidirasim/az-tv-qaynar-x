@@ -29,6 +29,7 @@ const Header: React.FC<HeaderProps> = ({ onCategorySelect }) => {
   const categories = categoriesData?.data?.categories || [];
 
   const handleCategoryClick = (category: Category | null) => {
+    console.log('Category clicked:', category);
     if (category) {
       navigate(`/category/${category.id}`);
     } else {
@@ -69,23 +70,29 @@ const Header: React.FC<HeaderProps> = ({ onCategorySelect }) => {
           </div>
           
           <div className="flex items-center space-x-2">
-            {/* Home Button */}
+            {/* Home Button - More Visible */}
             <Button 
-              variant="ghost" 
+              variant="default"
               size="sm"
               onClick={handleHomeClick}
-              className="flex items-center space-x-2"
+              className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white"
             >
               <Home className="w-4 h-4" />
               <span className="hidden sm:block">Xəbərlər</span>
             </Button>
 
-            {/* Menu Dropdown */}
+            {/* Categories Dropdown */}
             <DropdownMenu>
-              <DropdownMenuTrigger className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 transition-colors duration-200">
-                <Menu className="w-4 h-4 text-slate-700" />
-                <span className="text-sm font-medium text-slate-700 hidden sm:block">Kateqoriyalar</span>
-                <ChevronDown className="w-4 h-4 text-slate-700" />
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center space-x-2"
+                >
+                  <Menu className="w-4 h-4" />
+                  <span className="text-sm font-medium hidden sm:block">Kateqoriyalar</span>
+                  <ChevronDown className="w-4 h-4" />
+                </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-80 bg-white shadow-xl border border-gray-200 max-h-96 overflow-y-auto z-50">
                 <DropdownMenuItem 

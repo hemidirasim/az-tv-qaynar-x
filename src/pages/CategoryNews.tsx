@@ -20,11 +20,20 @@ const CategoryNews = () => {
     staleTime: 10 * 60 * 1000,
   });
 
-  const { data: newsData, isLoading, error } = useQuery({
+  const { data: newsData, isLoading, error, refetch } = useQuery({
     queryKey: ['categoryNews', categoryIdNum],
-    queryFn: () => categoryIdNum ? fetchNewsByCategory(categoryIdNum) : Promise.resolve({ data: [] }),
+    queryFn: () => {
+      console.log('Fetching category news for ID:', categoryIdNum);
+      if (categoryIdNum) {
+        return fetchNewsByCategory(categoryIdNum);
+      } else {
+        return Promise.resolve({ data: [] });
+      }
+    },
     enabled: !!categoryIdNum,
     staleTime: 5 * 60 * 1000,
+    retry: 3,
+    retryDelay: 1000,
   });
 
   const categories = categoriesData?.data?.categories || [];
@@ -32,12 +41,16 @@ const CategoryNews = () => {
   const categoryName = currentCategory?.name || 'Kateqoriya';
 
   const handleNewsClick = (news: NewsItem) => {
-    // You can implement news detail modal or navigation here
     console.log('News clicked:', news);
   };
 
   const handleBack = () => {
     navigate('/');
+  };
+
+  const handleRetry = () => {
+    console.log('Retrying category news fetch...');
+    refetch();
   };
 
   if (isLoading) {
@@ -62,6 +75,7 @@ const CategoryNews = () => {
   }
 
   if (error) {
+    console.error('Category news error:', error);
     return (
       <div className="min-h-screen bg-gray-50">
         <div className="sticky top-0 z-50 bg-white border-b px-4 py-3">
@@ -75,9 +89,15 @@ const CategoryNews = () => {
         <div className="flex justify-center items-center py-12">
           <div className="text-center">
             <p className="text-gray-600 mb-4">Xəbərləri yükləyərkən xəta baş verdi</p>
-            <Button onClick={() => window.location.reload()}>
-              Yenidən cəhd et
-            </Button>
+            <p className="text-sm text-gray-500 mb-4">Kateqoriya ID: {categoryIdNum}</p>
+            <div className="space-y-2">
+              <Button onClick={handleRetry} className="mr-2">
+                Yenidən cəhd et
+              </Button>
+              <Button variant="outline" onClick={handleBack}>
+                Geri qayıt
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -105,7 +125,8 @@ const CategoryNews = () => {
       <div className="px-4 py-6">
         {news.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-gray-600">Bu kateqoriyada xəbər yoxdur</p>
+            <p className="text-gray-600 mb-4">Bu kateqoriyada xəbər yoxdur</p>
+            <p className="text-sm text-gray-500">Kateqoriya ID: {categoryIdNum}</p>
           </div>
         ) : (
           <div className="space-y-6">
