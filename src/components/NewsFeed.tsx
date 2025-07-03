@@ -2,24 +2,40 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { NewsItem } from '@/types/news';
-import { fetchNews } from '@/utils/api';
+import { fetchNews, fetchNewsByCategory } from '@/utils/api';
 import NewsCard from './NewsCard';
 import { Button } from '@/components/ui/button';
 import { Loader2, RefreshCw } from 'lucide-react';
 
 interface NewsFeedProps {
   onNewsClick: (news: NewsItem) => void;
+  selectedCategoryId?: number | null;
+  categoryName?: string;
 }
 
-const NewsFeed: React.FC<NewsFeedProps> = ({ onNewsClick }) => {
+const NewsFeed: React.FC<NewsFeedProps> = ({ onNewsClick, selectedCategoryId, categoryName }) => {
   const [page, setPage] = useState(1);
   const [allNews, setAllNews] = useState<NewsItem[]>([]);
   const [hasMore, setHasMore] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
 
+  // Reset when category changes
+  useEffect(() => {
+    setPage(1);
+    setAllNews([]);
+    setHasMore(true);
+    setIsLoadingMore(false);
+  }, [selectedCategoryId]);
+
   const { data, isLoading, error, refetch, isRefetching } = useQuery({
-    queryKey: ['news', page],
-    queryFn: () => fetchNews(page),
+    queryKey: ['news', selectedCategoryId, page],
+    queryFn: () => {
+      if (selectedCategoryId) {
+        return fetchNewsByCategory(selectedCategoryId, page);
+      } else {
+        return fetchNews(page);
+      }
+    },
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
@@ -99,6 +115,13 @@ const NewsFeed: React.FC<NewsFeedProps> = ({ onNewsClick }) => {
 
   return (
     <div className="space-y-6">
+      {/* Category title */}
+      {categoryName && (
+        <div className="px-4 pt-4">
+          <h2 className="text-xl font-bold text-slate-800">{categoryName}</h2>
+        </div>
+      )}
+
       {/* Pull to refresh indicator */}
       <div className="flex justify-center py-2">
         <Button 

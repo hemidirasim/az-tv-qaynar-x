@@ -1,7 +1,115 @@
 
 import { NewsResponse } from '@/types/news';
+import { CategoryResponse } from '@/types/category';
 
 const API_BASE_URL = 'https://aztv.az/az/mobile-app/api';
+
+export const fetchCategories = async (): Promise<CategoryResponse> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/all-categories`);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    console.log('Kateqoriya API cavabı:', data);
+    
+    return data;
+  } catch (error) {
+    console.error('Kateqoriyaları yükləyərkən xəta:', error);
+    throw error;
+  }
+};
+
+export const fetchNewsByCategory = async (categoryId: number, page: number = 1, perPage: number = 40): Promise<NewsResponse> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/news/category/${categoryId}/official?per_page=${perPage}&page=${page}`);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    console.log('Kateqoriya xəbərləri API cavabı:', data);
+    
+    // API cavabının strukturunu düzəlt
+    if (data.success && data.data && data.data.news) {
+      const newsData = data.data.news.data.map((item: any) => {
+        // Şəkil URL-ini düzgün təyin et
+        let imageUrl = '/placeholder.svg';
+        
+        console.log('Orijinal şəkil URL-i:', item.image_url);
+        
+        if (item.image_url && item.image_url.trim() !== '') {
+          // Əgər URL artıq tam path-dursa (http/https ilə başlayır)
+          if (item.image_url.startsWith('http://') || item.image_url.startsWith('https://')) {
+            imageUrl = item.image_url;
+          } 
+          // Əgər URL '/' ilə başlayırsa - admin.aztv.az əlavə et  
+          else if (item.image_url.startsWith('/')) {
+            imageUrl = `https://admin.aztv.az${item.image_url}`;
+          }
+          // Əks halda - admin.aztv.az/ əlavə et
+          else {
+            imageUrl = `https://admin.aztv.az/${item.image_url}`;
+          }
+          
+          console.log('Düzəldilmiş şəkil URL-i:', imageUrl);
+        }
+        
+        // Başlıq, məzmun və alt başlığı düzgün parse et
+        const parseField = (field: any) => {
+          if (!field) return '';
+          if (typeof field === 'string') return field;
+          if (field.az) {
+            if (typeof field.az === 'string') return field.az;
+            if (field.az.value && field.az.value !== '[Max depth of 5 reached]') {
+              return field.az.value;
+            }
+          }
+          return '';
+        };
+
+        return {
+          id: item.id,
+          title: parseField(item.title) || 'Başlıq yoxdur',
+          content: parseField(item.content) || '',
+          summary: parseField(item.sub_title) || '',
+          image: imageUrl,
+          date: item.created_at,
+          created_at: item.created_at,
+          slug: item.slug || '',
+          category: ''
+        };
+      });
+
+      return {
+        data: newsData,
+        current_page: data.data.news.current_page || 1,
+        per_page: data.data.news.per_page || perPage,
+        total: data.data.news.total || newsData.length,
+        last_page: data.data.news.last_page || 1,
+        next_page_url: data.data.news.next_page_url,
+        prev_page_url: data.data.news.prev_page_url
+      };
+    }
+    
+    // Geri dönüş üçün boş cavab
+    return {
+      data: [],
+      current_page: 1,
+      per_page: perPage,
+      total: 0,
+      last_page: 1,
+      next_page_url: null,
+      prev_page_url: null
+    };
+  } catch (error) {
+    console.error('Kateqoriya xəbərlərini yükləyərkən xəta:', error);
+    throw error;
+  }
+};
 
 export const fetchNews = async (page: number = 1, perPage: number = 11): Promise<NewsResponse> => {
   try {

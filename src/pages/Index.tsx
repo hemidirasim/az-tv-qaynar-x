@@ -12,6 +12,8 @@ const Index = () => {
   const [activeTab, setActiveTab] = useState<'home' | 'live' | 'settings'>('home');
   const [selectedNews, setSelectedNews] = useState<NewsItem | null>(null);
   const [isNewsDetailOpen, setIsNewsDetailOpen] = useState(false);
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
+  const [categoryName, setCategoryName] = useState<string>('Bütün Xəbərlər');
 
   const handleNewsClick = (news: NewsItem) => {
     setSelectedNews(news);
@@ -23,22 +25,39 @@ const Index = () => {
     setSelectedNews(null);
   };
 
+  const handleCategorySelect = (categoryId: number | null, name: string) => {
+    setSelectedCategoryId(categoryId);
+    setCategoryName(name);
+  };
+
   const renderContent = () => {
     switch (activeTab) {
       case 'home':
-        return <NewsFeed onNewsClick={handleNewsClick} />;
+        return (
+          <NewsFeed 
+            onNewsClick={handleNewsClick} 
+            selectedCategoryId={selectedCategoryId}
+            categoryName={categoryName}
+          />
+        );
       case 'live':
         return <LiveTV />;
       case 'settings':
         return <Settings />;
       default:
-        return <NewsFeed onNewsClick={handleNewsClick} />;
+        return (
+          <NewsFeed 
+            onNewsClick={handleNewsClick} 
+            selectedCategoryId={selectedCategoryId}
+            categoryName={categoryName}
+          />
+        );
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
+      <Header onCategorySelect={handleCategorySelect} />
       
       <main className="pb-20">
         {renderContent()}

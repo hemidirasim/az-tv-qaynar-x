@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Menu, ChevronDown } from 'lucide-react';
 import {
   DropdownMenu,
@@ -7,18 +8,27 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { fetchCategories } from '@/utils/api';
+import { Category } from '@/types/category';
 
-const Header = () => {
-  const categories = [
-    'Son Xəbərlər',
-    'Siyasət',
-    'İqtisadiyyat',
-    'İdman',
-    'Mədəniyyət',
-    'Texnologiya',
-    'Dünya',
-    'Cəmiyyət'
-  ];
+interface HeaderProps {
+  onCategorySelect?: (categoryId: number | null, categoryName: string) => void;
+}
+
+const Header: React.FC<HeaderProps> = ({ onCategorySelect }) => {
+  const { data: categoriesData } = useQuery({
+    queryKey: ['categories'],
+    queryFn: fetchCategories,
+    staleTime: 10 * 60 * 1000, // 10 minutes
+  });
+
+  const categories = categoriesData?.data?.categories || [];
+
+  const handleCategoryClick = (category: Category | null) => {
+    if (onCategorySelect) {
+      onCategorySelect(category?.id || null, category?.name || 'Bütün Xəbərlər');
+    }
+  };
 
   return (
     <header className="bg-white shadow-lg sticky top-0 z-50 border-b border-gray-100">
@@ -58,12 +68,20 @@ const Header = () => {
                 <ChevronDown className="w-4 h-4 text-slate-700" />
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-48 bg-white shadow-xl border border-gray-200">
+                <DropdownMenuItem 
+                  key="all"
+                  className="cursor-pointer hover:bg-slate-50 focus:bg-slate-50 text-slate-700 font-medium"
+                  onClick={() => handleCategoryClick(null)}
+                >
+                  Bütün Xəbərlər
+                </DropdownMenuItem>
                 {categories.map((category) => (
                   <DropdownMenuItem 
-                    key={category}
+                    key={category.id}
                     className="cursor-pointer hover:bg-slate-50 focus:bg-slate-50 text-slate-700 font-medium"
+                    onClick={() => handleCategoryClick(category)}
                   >
-                    {category}
+                    {category.name}
                   </DropdownMenuItem>
                 ))}
               </DropdownMenuContent>
