@@ -2,7 +2,7 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import { Menu, ChevronDown, Home } from 'lucide-react';
+import { Menu, ChevronDown } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -37,10 +37,6 @@ const Header: React.FC<HeaderProps> = ({ onCategorySelect }) => {
     }
   };
 
-  const handleHomeClick = () => {
-    navigate('/');
-  };
-
   return (
     <header className="bg-white shadow-lg sticky top-0 z-50 border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -50,37 +46,27 @@ const Header: React.FC<HeaderProps> = ({ onCategorySelect }) => {
               <img 
                 src="https://admin.aztv.az/userfiles/files/a.png" 
                 alt="AzTV Logo" 
-                className="h-10 w-auto transition-transform hover:scale-110 duration-300"
+                className="h-10 w-auto transition-transform hover:scale-110 duration-300 cursor-pointer"
+                onClick={() => navigate('/')}
                 onError={(e) => {
                   e.currentTarget.src = '/placeholder.svg';
                 }}
               />
             </div>
             <div className="hidden sm:block">
-              <h1 className="text-2xl font-bold text-slate-800">
+              <h1 className="text-2xl font-bold text-slate-800 cursor-pointer" onClick={() => navigate('/')}>
                 AzTV
               </h1>
               <p className="text-xs text-slate-600 -mt-1 font-medium">Rəsmi Mobil Tətbiq</p>
             </div>
             <div className="block sm:hidden">
-              <h1 className="text-xl font-bold text-slate-800">
+              <h1 className="text-xl font-bold text-slate-800 cursor-pointer" onClick={() => navigate('/')}>
                 AzTV
               </h1>
             </div>
           </div>
           
           <div className="flex items-center space-x-2">
-            {/* Home Button - More Visible */}
-            <Button 
-              variant="default"
-              size="sm"
-              onClick={handleHomeClick}
-              className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white"
-            >
-              <Home className="w-4 h-4" />
-              <span className="hidden sm:block">Xəbərlər</span>
-            </Button>
-
             {/* Categories Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Play, Volume2, VolumeX, Maximize, Minimize, Users, Clock } from 'lucide-react';
+import { Volume2, VolumeX, Maximize, Minimize, Users, Clock } from 'lucide-react';
 
 const LiveTV = () => {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -81,7 +81,6 @@ const LiveTV = () => {
                 <div className="text-center text-white px-3 sm:px-4">
                   <div className="mb-3 sm:mb-4 md:mb-8">
                     <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-32 md:h-32 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-3 sm:mb-4 md:mb-6 backdrop-blur-sm border border-white/10 shadow-2xl">
-                      <Play className="h-8 w-8 sm:h-10 sm:w-10 md:h-16 md:w-16 text-white opacity-90 fill-current ml-1" />
                     </div>
                   </div>
                   <h3 className="text-lg sm:text-xl md:text-2xl font-bold mb-2 md:mb-4">Canlı Yayımı İzləyin</h3>
@@ -93,7 +92,6 @@ const LiveTV = () => {
                     size="lg"
                     className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-full px-6 py-3 sm:px-8 sm:py-4 md:px-12 md:py-6 text-sm sm:text-base md:text-lg font-semibold shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-105 border-0"
                   >
-                    <Play className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 mr-2 fill-current" />
                     Yayımı Başlat
                   </Button>
                 </div>
@@ -176,7 +174,6 @@ const LiveTV = () => {
           <div className="bg-white rounded-lg sm:rounded-xl p-3 sm:p-4 md:p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-shadow duration-300">
             <div className="flex flex-col sm:flex-row items-center sm:space-x-2 mb-2 sm:mb-3 md:mb-4">
               <div className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 bg-purple-100 rounded-full flex items-center justify-center mb-1 sm:mb-0">
-                <Play className="h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5 text-purple-600" />
               </div>
               <h3 className="text-xs sm:text-sm md:text-lg font-bold text-gray-800 text-center sm:text-left">Keyfiyyət</h3>
             </div>

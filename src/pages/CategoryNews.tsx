@@ -26,9 +26,8 @@ const CategoryNews = () => {
       console.log('Fetching category news for ID:', categoryIdNum);
       if (categoryIdNum) {
         return fetchNewsByCategory(categoryIdNum);
-      } else {
-        return Promise.resolve({ data: [] });
       }
+      throw new Error('Category ID is required');
     },
     enabled: !!categoryIdNum,
     staleTime: 5 * 60 * 1000,
